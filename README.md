@@ -10,34 +10,55 @@ https://kikeestradadev.github.io/api-exp/api.json
 
 ## 📦 Instalación y Despliegue
 
-### 1. Subir a GitHub
+### Método 1: Deploy automático con npm (Recomendado)
 
 ```bash
-# Inicializar repositorio (si no lo has hecho)
-git init
+# 1. Clonar el repositorio
+git clone https://github.com/kikeestradadev/api-exp.git
+cd api-exp
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Desplegar a GitHub Pages
+npm run deploy
+```
+
+### Método 2: Deploy manual
+
+```bash
+# 1. Subir cambios a GitHub
 git add .
-git commit -m "Initial commit: Legal Cases API"
+git commit -m "Update API"
+git push origin main
 
-# Crear repositorio en GitHub y subir
-git remote add origin https://github.com/TU-USUARIO/api-exp.git
-git branch -M main
-git push -u origin main
+# 2. Activar GitHub Pages desde Settings → Pages
+# Branch: main, Folder: / (root)
 ```
 
-### 2. Activar GitHub Pages
+## 🛠️ Scripts disponibles
 
-1. Ve a tu repositorio en GitHub
-2. Click en **Settings** (Configuración)
-3. Scroll hasta **Pages** en el menú lateral
-4. En **Source**, selecciona **Deploy from a branch**
-5. Selecciona **main** branch y **/ (root)**
-6. Click **Save**
+```bash
+# Desplegar a GitHub Pages
+npm run deploy
 
-### 3. Esperar el despliegue
+# Desplegar forzadamente (si hay conflictos)
+npm run deploy:force
 
-GitHub Pages tardará unos minutos en estar disponible. Recibirás la URL final que será:
-```
-https://kikeestradadev.github.io/api-exp/
+# Servir localmente en puerto 3000
+npm start
+
+# Servir localmente en puerto 8080 y abrir navegador
+npm run serve
+
+# Preview local
+npm run preview
+
+# Validar que el JSON es válido
+npm run validate-json
+
+# Probar la API en producción
+npm test
 ```
 
 ## 🔗 Endpoints
@@ -165,6 +186,13 @@ curl -s "https://kikeestradadev.github.io/api-exp/api.json" | jq '.[] | select(.
    Content-Type: application/json
    ```
 
+### Importar colección:
+
+Puedes importar la colección pre-configurada desde:
+```
+https://kikeestradadev.github.io/api-exp/examples/postman-collection.json
+```
+
 ### Pruebas en Postman:
 
 ```javascript
@@ -181,16 +209,6 @@ pm.test("Response has cases", function () {
     const jsonData = pm.response.json();
     pm.expect(jsonData).to.be.an('array');
     pm.expect(jsonData.length).to.be.greaterThan(0);
-});
-
-pm.test("Each case has required fields", function () {
-    const jsonData = pm.response.json();
-    const firstCase = jsonData[0];
-    
-    pm.expect(firstCase).to.have.property('id');
-    pm.expect(firstCase).to.have.property('caseNumber');
-    pm.expect(firstCase).to.have.property('clientName');
-    pm.expect(firstCase).to.have.property('status');
 });
 ```
 
@@ -243,6 +261,40 @@ function getStats(cases) {
 }
 ```
 
+## 🔄 Flujo de Desarrollo
+
+### Para actualizar la API:
+
+1. **Editar datos:**
+   ```bash
+   # Editar api.json con nuevos datos
+   npm run validate-json  # Verificar que el JSON es válido
+   ```
+
+2. **Probar localmente:**
+   ```bash
+   npm run serve  # Abre http://localhost:8080
+   ```
+
+3. **Desplegar:**
+   ```bash
+   npm run deploy  # Deploy automático a GitHub Pages
+   ```
+
+### Para desarrollo local:
+
+```bash
+# Instalar dependencias
+npm install
+
+# Iniciar servidor local
+npm start
+
+# En otro terminal, probar cambios
+npm run validate-json
+npm test
+```
+
 ## 🚀 Próximos Pasos
 
 Para expandir esta API puedes:
@@ -256,10 +308,41 @@ Para expandir esta API puedes:
 
 1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+3. Edita `api.json` o añade nuevas funcionalidades
+4. Valida los cambios (`npm run validate-json`)
+5. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+6. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+7. Abre un Pull Request
 
 ## 📄 Licencia
 
-Este proyecto es de dominio público y se puede usar libremente para fines educativos y de práctica.
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 🔧 Troubleshooting
+
+### Problemas comunes:
+
+1. **Deploy falla:**
+   ```bash
+   npm run deploy:force
+   ```
+
+2. **JSON inválido:**
+   ```bash
+   npm run validate-json
+   ```
+
+3. **CORS errors en desarrollo:**
+   ```bash
+   npm run serve  # Usa http-server con CORS habilitado
+   ```
+
+4. **Permisos de GitHub:**
+   - Verifica que tienes acceso al repositorio
+   - Configura tu token de GitHub si es necesario
+
+## 📞 Soporte
+
+- **Issues:** https://github.com/kikeestradadev/api-exp/issues
+- **Discussions:** https://github.com/kikeestradadev/api-exp/discussions
+- **Wiki:** https://github.com/kikeestradadev/api-exp/wiki

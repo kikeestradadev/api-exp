@@ -1,0 +1,45 @@
+{
+  "name": "legal-cases-api",
+  "version": "1.0.0",
+  "description": "API REST pública para casos legales desplegada en GitHub Pages",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -c-1 --cors",
+    "build": "echo 'No build needed - static files'",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d . -m 'Deploy Legal Cases API'",
+    "deploy:force": "gh-pages -d . -f -m 'Force deploy Legal Cases API'",
+    "serve": "npx http-server . -p 8080 -c-1 --cors -o",
+    "test": "echo 'Testing API endpoint...' && curl -s https://kikeestradadev.github.io/api-exp/api.json | head -c 100",
+    "validate-json": "node -e 'JSON.parse(require(\"fs\").readFileSync(\"api.json\", \"utf8\")); console.log(\"✅ JSON válido\")'",
+    "preview": "echo 'Starting local preview...' && npx http-server . -p 3000 -c-1 --cors -o"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kikeestradadev/api-exp.git"
+  },
+  "keywords": [
+    "api",
+    "rest",
+    "json",
+    "legal",
+    "cases",
+    "github-pages",
+    "public-api",
+    "demo"
+  ],
+  "author": "kikeestradadev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kikeestradadev/api-exp/issues"
+  },
+  "homepage": "https://kikeestradadev.github.io/api-exp/",
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

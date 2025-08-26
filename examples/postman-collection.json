@@ -1,8 +1,10 @@
 {
   "info": {
     "name": "Legal Cases API",
-    "description": "Colección de Postman para probar la API de casos legales",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "description": "Colección de Postman para probar la API de casos legales desplegada en GitHub Pages",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "legal-cases-api-collection",
+    "version": "1.0.0"
   },
   "item": [
     {
@@ -34,12 +36,23 @@
               "    pm.expect(firstCase).to.have.property('caseNumber');",
               "    pm.expect(firstCase).to.have.property('clientName');",
               "    pm.expect(firstCase).to.have.property('status');",
+              "    pm.expect(firstCase).to.have.property('courtName');",
+              "    pm.expect(firstCase).to.have.property('filingDate');",
+              "});",
+              "",
+              "pm.test(\"Response time is less than 2000ms\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
               "});",
               "",
               "// Guardar datos para otros tests",
               "const responseJson = pm.response.json();",
               "pm.globals.set(\"totalCases\", responseJson.length);",
-              "pm.globals.set(\"firstCaseId\", responseJson[0].id);"
+              "pm.globals.set(\"firstCaseId\", responseJson[0].id);",
+              "pm.globals.set(\"activeCasesCount\", responseJson.filter(c => c.status === 1).length);",
+              "",
+              "console.log(`Total cases: ${responseJson.length}`);",
+              "console.log(`Active cases: ${responseJson.filter(c => c.status === 1).length}`);",
+              "console.log(`Unique clients: ${new Set(responseJson.map(c => c.clientId)).size}`);"
             ],
             "type": "text/javascript"
           }
@@ -50,7 +63,13 @@
         "header": [
           {
             "key": "Accept",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "User-Agent",
+            "value": "PostmanLegalCasesAPI/1.0",
+            "type": "text"
           }
         ],
         "url": {
@@ -62,16 +81,112 @@
             "api.json"
           ]
         },
-        "description": "Obtiene todos los casos legales disponibles en la API"
+        "description": "Obtiene todos los casos legales disponibles en la API. Esta request incluye validaciones automáticas para verificar la estructura de los datos."
+      },
+      "response": [
+        {
+          "name": "Successful Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api.json",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api.json"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n  {\n    \"id\": 1,\n    \"clientId\": 10,\n    \"caseNumber\": \"CASE-2025-0001\",\n    \"caseName\": \"Tax Appeal: Erick vs. Private Party\",\n    \"description\": \"Case regarding tax appeal...\",\n    \"filingDate\": \"2025-02-24 16:55:00\",\n    \"courtName\": \"Cartago Family Court\",\n    \"createdAt\": \"2025-02-24 18:48:00\",\n    \"updatedAt\": \"2025-03-26 01:48:00\",\n    \"status\": 1,\n    \"clientName\": \"Erick Poveda\"\n  }\n]"
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Health check - API is accessible\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is text/html or application/json\", function () {",
+              "    const contentType = pm.response.headers.get('Content-Type');",
+              "    pm.expect(contentType).to.satisfy(function(type) {",
+              "        return type.includes('text/html') || type.includes('application/json');",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        },
+        "description": "Verifica que el sitio web está funcionando correctamente"
       },
       "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set timestamp for this request",
+          "pm.globals.set(\"requestTimestamp\", new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test - log basic info",
+          "console.log(`Request: ${pm.info.requestName}`);",
+          "console.log(`Status: ${pm.response.status} ${pm.response.reason()}`);",
+          "console.log(`Response time: ${pm.response.responseTime}ms`);"
+        ]
+      }
     }
   ],
   "variable": [
     {
       "key": "baseUrl",
       "value": "https://kikeestradadev.github.io/api-exp",
-      "type": "string"
+      "type": "string",
+      "description": "Base URL para la API de casos legales"
     }
   ]
 }
