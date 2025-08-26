@@ -5,10 +5,8 @@ API REST pública para casos legales, desplegada en GitHub Pages para práctica 
 ## 🚀 URL de la API
 
 ```
-https://TU-USUARIO.github.io/api-exp/api.json
+https://kikeestradadev.github.io/api-exp/api.json
 ```
-
-> **Nota:** Reemplaza `TU-USUARIO` con tu nombre de usuario de GitHub.
 
 ## 📦 Instalación y Despliegue
 
@@ -39,7 +37,7 @@ git push -u origin main
 
 GitHub Pages tardará unos minutos en estar disponible. Recibirás la URL final que será:
 ```
-https://tu-usuario.github.io/api-exp/
+https://kikeestradadev.github.io/api-exp/
 ```
 
 ## 🔗 Endpoints
@@ -87,7 +85,7 @@ https://tu-usuario.github.io/api-exp/
 ```javascript
 async function getCases() {
   try {
-    const response = await fetch('https://tu-usuario.github.io/api-exp/api.json');
+    const response = await fetch('https://kikeestradadev.github.io/api-exp/api.json');
     const cases = await response.json();
     console.log('Total de casos:', cases.length);
     return cases;
@@ -106,7 +104,7 @@ getCases().then(cases => {
 ### jQuery
 
 ```javascript
-$.getJSON('https://tu-usuario.github.io/api-exp/api.json')
+$.getJSON('https://kikeestradadev.github.io/api-exp/api.json')
   .done(function(data) {
     $('#caseCount').text(data.length);
     
@@ -134,7 +132,7 @@ import requests
 import json
 
 # Obtener datos de la API
-response = requests.get('https://tu-usuario.github.io/api-exp/api.json')
+response = requests.get('https://kikeestradadev.github.io/api-exp/api.json')
 cases = response.json()
 
 print(f"Total de casos: {len(cases)}")
@@ -148,11 +146,11 @@ print(f"Casos en San José: {len(san_jose_cases)}")
 
 ```bash
 # Obtener todos los casos
-curl -X GET "https://tu-usuario.github.io/api-exp/api.json" \
+curl -X GET "https://kikeestradadev.github.io/api-exp/api.json" \
   -H "Accept: application/json"
 
 # Usar jq para filtrar (si tienes jq instalado)
-curl -s "https://tu-usuario.github.io/api-exp/api.json" | jq '.[] | select(.status == 1)'
+curl -s "https://kikeestradadev.github.io/api-exp/api.json" | jq '.[] | select(.status == 1)'
 ```
 
 ## 📱 Usando en Postman
@@ -160,7 +158,7 @@ curl -s "https://tu-usuario.github.io/api-exp/api.json" | jq '.[] | select(.stat
 ### Configuración básica:
 
 1. **Método**: GET
-2. **URL**: `https://tu-usuario.github.io/api-exp/api.json`
+2. **URL**: `https://kikeestradadev.github.io/api-exp/api.json`
 3. **Headers** (opcional):
    ```
    Accept: application/json
