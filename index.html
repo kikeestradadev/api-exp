@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Cases API</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+        .endpoint code {
+            background: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .example {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ Legal Cases API</h1>
+        
+        <div class="status active">
+            ✅ API Activa y Funcionando
+        </div>
+        
+        <h2>📡 Endpoint Principal</h2>
+        <div class="endpoint">
+            <strong>GET</strong> 
+            <code id="api-url">https://tu-usuario.github.io/api-exp/api.json</code>
+            <button class="copy-btn" onclick="copyUrl()">Copiar URL</button>
+        </div>
+        
+        <h2>📋 Descripción</h2>
+        <p>API REST que proporciona información sobre casos legales incluyendo:</p>
+        <ul>
+            <li>Información de clientes</li>
+            <li>Números de caso y nombres</li>
+            <li>Fechas de presentación</li>
+            <li>Estados de casos</li>
+            <li>Información de cortes</li>
+        </ul>
+        
+        <h2>🔧 Ejemplos de Uso</h2>
+        
+        <div class="example">
+            <h3>JavaScript/Fetch</h3>
+            <pre><code>fetch('https://tu-usuario.github.io/api-exp/api.json')
+  .then(response => response.json())
+  .then(data => console.log(data));</code></pre>
+        </div>
+        
+        <div class="example">
+            <h3>jQuery</h3>
+            <pre><code>$.getJSON('https://tu-usuario.github.io/api-exp/api.json')
+  .done(function(data) {
+    console.log(data);
+  });</code></pre>
+        </div>
+        
+        <div class="example">
+            <h3>Postman</h3>
+            <p>1. Abre Postman</p>
+            <p>2. Configura una nueva request GET</p>
+            <p>3. Pega la URL del endpoint</p>
+            <p>4. Envía la request</p>
+        </div>
+        
+        <h2>📊 Datos de Ejemplo</h2>
+        <p>La API contiene <span id="totalCases">50</span> casos legales con la siguiente estructura:</p>
+        <pre><code>{
+  "id": 1,
+  "clientId": 10,
+  "caseNumber": "CASE-2025-0001",
+  "caseName": "Tax Appeal: Erick vs. Private Party",
+  "description": "Descripción del caso...",
+  "filingDate": "2025-02-24 16:55:00",
+  "courtName": "Cartago Family Court",
+  "createdAt": "2025-02-24 18:48:00",
+  "updatedAt": "2025-03-26 01:48:00",
+  "status": 1,
+  "clientName": "Erick Poveda"
+}</code></pre>
+        
+        <h2>🌐 CORS</h2>
+        <p>GitHub Pages sirve automáticamente los archivos con los headers CORS apropiados, por lo que puedes consumir esta API desde cualquier dominio.</p>
+        
+        <div class="endpoint">
+            <strong>Prueba la API ahora:</strong>
+            <button onclick="testApi()" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                🧪 Probar API
+            </button>
+            <div id="testResult" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Actualizar URL automáticamente
+        window.onload = function() {
+            const currentUrl = window.location.origin + window.location.pathname.replace('index.html', '') + 'api.json';
+            document.getElementById('api-url').textContent = currentUrl;
+        };
+        
+        function copyUrl() {
+            const url = document.getElementById('api-url').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL copiada al portapapeles!');
+            });
+        }
+        
+        function testApi() {
+            const url = document.getElementById('api-url').textContent;
+            const resultDiv = document.getElementById('testResult');
+            
+            resultDiv.innerHTML = '<p>🔄 Cargando...</p>';
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML = `
+                        <p style="color: green;">✅ ¡API funcionando correctamente!</p>
+                        <p><strong>Total de casos encontrados:</strong> ${data.length}</p>
+                        <p><strong>Primer caso:</strong> ${data[0].caseName}</p>
+                    `;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                });
+        }
+    </script>
+</body>
+</html>

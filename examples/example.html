@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo de Consumo - Legal Cases API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .search-input {
+            width: 300px;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1976d2;
+            display: block;
+        }
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .case-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .case-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .case-number {
+            background: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ Ejemplo de Consumo - Legal Cases API</h1>
+        
+        <div class="controls">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar por cliente, caso o corte...">
+            <button class="btn" onclick="searchCases()">🔍 Buscar</button>
+            <button class="btn" onclick="loadAllCases()">📋 Cargar Todos</button>
+            <button class="btn" onclick="getActiveOnly()">✅ Solo Activos</button>
+            <button class="btn" onclick="getStats()">📊 Estadísticas</button>
+        </div>
+        
+        <div id="apiUrl" style="background: #e9ecef; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <strong>URL de la API:</strong> <span id="urlDisplay">Cargando...</span>
+        </div>
+        
+        <div class="stats" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <span class="stat-number" id="totalCases">0</span>
+                <span>Total de Casos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="activeCases">0</span>
+                <span>Casos Activos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="uniqueClients">0</span>
+                <span>Clientes Únicos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="uniqueCourts">0</span>
+                <span>Cortes</span>
+            </div>
+        </div>
+        
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            🔄 Cargando datos de la API...
+        </div>
+        
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        
+        <div id="casesContainer" class="cases-grid"></div>
+    </div>
+
+    <script>
+        let allCases = [];
+        const API_URL = window.location.origin + window.location.pathname.replace('examples/example.html', 'api.json');
+        
+        // Mostrar URL de la API
+        document.getElementById('urlDisplay').textContent = API_URL;
+        
+        // Función para mostrar loading
+        function showLoading(show = true) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+        
+        // Función para mostrar error
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Función para obtener datos de la API
+        async function fetchCases() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                allCases = data;
+                return data;
+                
+            } catch (error) {
+                console.error('Error fetching cases:', error);
+                showError(`Error al cargar los datos: ${error.message}`);
+                return [];
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Función para mostrar casos
+        function displayCases(cases) {
+            const container = document.getElementById('casesContainer');
+            
+            if (cases.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No se encontraron casos</div>';
+                return;
+            }
+            
+            container.innerHTML = cases.map(case => `
+                <div class="case-card">
+                    <div style="margin-bottom: 10px;">
+                        <span class="case-number">${case.caseNumber}</span>
+                        <span class="status ${case.status === 1 ? 'active' : 'inactive'}">
+                            ${case.status === 1 ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </div>
+                    <h3>${case.caseName}</h3>
+                    <p><strong>Cliente:</strong> ${case.clientName}</p>
+                    <p><strong>Corte:</strong> ${case.courtName}</p>
+                    <p><strong>Fecha:</strong> ${new Date(case.filingDate).toLocaleDateString('es-ES')}</p>
+                    <p><strong>Descripción:</strong> ${case.description.substring(0, 100)}...</p>
+                </div>
+            `).join('');
+        }
+        
+        // Función para cargar todos los casos
+        async function loadAllCases() {
+            const cases = await fetchCases();
+            displayCases(cases);
+        }
+        
+        // Función para buscar casos
+        function searchCases() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayCases(allCases);
+                return;
+            }
+            
+            const filteredCases = allCases.filter(case => 
+                case.clientName.toLowerCase().includes(searchTerm) ||
+                case.caseNumber.toLowerCase().includes(searchTerm) ||
+                case.caseName.toLowerCase().includes(searchTerm) ||
+                case.courtName.toLowerCase().includes(searchTerm)
+            );
+            
+            displayCases(filteredCases);
+        }
+        
+        // Función para mostrar solo casos activos
+        function getActiveOnly() {
+            const activeCases = allCases.filter(case => case.status === 1);
+            displayCases(activeCases);
+        }
+        
+        // Función para calcular estadísticas
+        function getStats() {
+            if (allCases.length === 0) {
+                alert('Primero carga los casos');
+                return;
+            }
+            
+            const stats = {
+                total: allCases.length,
+                active: allCases.filter(c => c.status === 1).length,
+                uniqueClients: new Set(allCases.map(c => c.clientId)).size,
+                uniqueCourts: new Set(allCases.map(c => c.courtName)).size
+            };
+            
+            document.getElementById('totalCases').textContent = stats.total;
+            document.getElementById('activeCases').textContent = stats.active;
+            document.getElementById('uniqueClients').textContent = stats.uniqueClients;
+            document.getElementById('uniqueCourts').textContent = stats.uniqueCourts;
+            
+            document.getElementById('statsContainer').style.display = 'grid';
+        }
+        
+        // Event listener para búsqueda en tiempo real
+        document.getElementById('searchInput').addEventListener('input', searchCases);
+        
+        // Event listener para Enter en el campo de búsqueda
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCases();
+            }
+        });
+        
+        // Cargar casos al cargar la página
+        window.onload = function() {
+            loadAllCases();
+        };
+        
+        // Ejemplos de uso programático
+        console.log('=== EJEMPLOS DE USO DE LA API ===');
+        console.log('1. Cargar todos los casos: loadAllCases()');
+        console.log('2. Buscar casos: usar el campo de búsqueda o searchCases()');
+        console.log('3. Filtrar activos: getActiveOnly()');
+        console.log('4. Ver estadísticas: getStats()');
+        console.log('5. Acceso directo a datos: allCases variable global');
+        console.log('6. URL de la API:', API_URL);
+    </script>
+</body>
+</html>
